@@ -1,9 +1,67 @@
-import Image from "next/image";
+'use client';
 
-export default function Home() {
+// import { AuthContext } from "@/context/auth_context_provider";
+import { AuthContext } from "../context/auth_context_provider";
+import { useFetch } from "../hooks/useFetch";
+// import { useFetch } from "@/hooks/useFetch";
+import Image from "next/image";
+import Link from "next/link";
+import React, { useContext, useReducer } from 'react';
+
+const counterReducer = (state: { count: number; }, action: { type: any; }) => {
+  switch (action.type) {
+    case 'INCREMENT':
+      return { count: state.count + 1 };
+    case 'DECREMENT':
+      return { count: state.count - 1 };
+    default:
+      return state;
+  }
+};
+
+const initialState = { count: 0 };
+
+export default function Page() {
+  const {isLoggedIn} = useContext(AuthContext);
+  const { data, isLoading, error } = useFetch("https://jsonplaceholder.typicode.com/todos/1")
+
+  console.log("data", data)
+
+  const [state, dispatch] = useReducer(counterReducer, initialState);
+
+  const handleIncrement = () => {
+    dispatch({ type: 'INCREMENT' });
+  };
+
+  const handleDecrement = () => {
+    dispatch({ type: 'DECREMENT' });
+  };
+
   return (
+    <>
+    {isLoggedIn ?
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
+      <div>
+        <h1>Home</h1>
+        <Link href="/about">About</Link>
+      </div>
+      <div>
+        <p>Count: {state.count}</p>
+        <button onClick={handleIncrement}>+</button>
+        <button onClick={handleDecrement}>-</button>
+      </div>
+    </main>
+    : <>
+      <div>
+        <h1>Home</h1>
+        <Link href="/about">About</Link>
+      </div>
+    </>}
+      </>
+  );
+}
+
+      {/* <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
         <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
           Get started by editing&nbsp;
           <code className="font-mono font-bold">app/page.tsx</code>
@@ -107,7 +165,4 @@ export default function Home() {
             Instantly deploy your Next.js site to a shareable URL with Vercel.
           </p>
         </a>
-      </div>
-    </main>
-  );
-}
+      </div> */}
